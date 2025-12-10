@@ -1,0 +1,24 @@
+# MCU Project .gitignore
+
+# Complie output
+*.crf
+*.o
+*.d
+*.iex
+*.axf
+*.htm
+*.hex
+*.lnp
+*.map
+*.sct
+*.dep
+
+# Keil MDK output (Now Contents' next)
+MDK-ARM/EventRecorderStub.scvd
+MDK-ARM/JLinkLog.txt
+MDK-ARM/JLinkSettings.ini
+MDK-ARM/startup_stm32g431xx.lst
+MDK-ARM/stm32g431_FOC.uvguix.86390
+MDK-ARM/stm32g431_FOC.uvguix.Phil
+MDK-ARM/stm32g431_FOC.uvoptx
+MDK-ARM/DebugConfig/stm32g431_FOC_STM32G431RBTx.dbgconf
