@@ -16,7 +16,7 @@
 #define SVPWM_K (1.732f * Ts / Vdc)   //这个是SVPWM的算法公式
 #define POLE_PAIR_NUM 7         /* 电机极对数 */
 
-#define BUFF_SIZE      20       /* 串口空闲中断缓冲区 */
+#define BUFF_SIZE      128       /* 串口空闲中断缓冲区 */
 
 /*
 注意:AS5600的地址0x36是指的是原始7位设备地址,而ST I2C库中的设备地址是指原始设备地址左移一位得到的设备地址
