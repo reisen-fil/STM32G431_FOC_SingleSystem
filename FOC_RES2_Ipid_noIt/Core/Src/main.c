@@ -117,7 +117,7 @@ int main(void)
   while (1)
   {
       UART_RX_Handle();       /* 在空闲中断中接收完一次数据后，对其进行处理 */
-			printf("%1.4f,%1.4f,%1.4f\n",Park_DQ.theta,Park_DQ.I_q,Park_DQ.I_d);    /* 上位机数据监测 */
+			printf("%1.4f,%1.4f,%1.4f,%1.4f,%1.4f,%1.4f\n",Park_DQ.theta,Park_DQ.I_q,Park_DQ.I_d,Current_abc.Ia,Current_abc.Ib,Current_abc.Ic);    /* 上位机数据监测 */
 		
     /* USER CODE END WHILE */
 

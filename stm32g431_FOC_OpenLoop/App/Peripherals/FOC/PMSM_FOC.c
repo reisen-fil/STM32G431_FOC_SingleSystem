@@ -251,8 +251,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim->Instance == TIM7)
 	{
-			Open_PMSM_FOC();
-	
+		Open_PMSM_FOC();
 	}
 }
 

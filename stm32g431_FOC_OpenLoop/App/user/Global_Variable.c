@@ -20,5 +20,5 @@ float Target_Uq;            /* ?????? */
 /* debug */
 uint8_t rx_buffer[BUFF_SIZE];           /* Ω” ’ª∫≥Â«¯ */
 uint8_t UART_RX_Flag;
-
+volatile uint8_t usart_dma_tx_over = 1;        /* ??dma?????? */
 

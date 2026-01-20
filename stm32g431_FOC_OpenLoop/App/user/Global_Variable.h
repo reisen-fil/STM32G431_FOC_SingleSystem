@@ -88,7 +88,7 @@ extern float Amp_Offset[2];		/* 采样电压偏置 */
 /* debug */
 extern uint8_t rx_buffer[BUFF_SIZE];           /* 接收缓冲区 */
 extern uint8_t UART_RX_Flag;
-
+extern volatile uint8_t usart_dma_tx_over;
 
 
 #endif

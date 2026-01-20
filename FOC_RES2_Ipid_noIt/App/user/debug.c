@@ -1,26 +1,30 @@
 #include "debug.h"
 
-/* 串口重定向 */
-#pragma import(__use_no_semihosting)             
-//标准库需要的支持函数                 
-struct __FILE 
-{ 
-	int handle; 
+/* 串口+DMA重定向printf */
+int myprintf(const char *format,...)
+{
+  va_list arg;
+  static char SendBuff[200] = {0};
+  int rv;
+  while(!usart_dma_tx_over);//等待前一次DMA发送完成
  
-}; 
+  va_start(arg,format);
+  rv = vsnprintf((char*)SendBuff,sizeof(SendBuff)+1,(char*)format,arg);
+  va_end(arg);
  
-FILE __stdout;       
-//定义_sys_exit()以避免使用半主机模式    
-void _sys_exit(int x) 
-{ 
-	x = x; 
-} 
-//重定义fputc函数 
-int fputc(int ch, FILE *f)
-{      
-    //二选一,功能一样
-    HAL_UART_Transmit (&huart1 ,(uint8_t *)&ch,1,HAL_MAX_DELAY );
-		return ch;
+  HAL_UART_Transmit_DMA(&huart1,(uint8_t *)SendBuff,rv);
+  usart_dma_tx_over = 0;//清0全局标志，发送完成后重新置1
+ 
+  return rv;
+}
+ 
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->Instance==USART1)
+	{
+  		 usart_dma_tx_over = 1;
+	}
+ 
 }
 
 /* 通过蓝牙串口对下位机状态进行控制部分 */
@@ -39,15 +43,53 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
    }
 }	
 
+/* ORE_error test */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef * huart)
 {
     if(huart->Instance == USART1)
     {
-		HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rx_buffer, BUFF_SIZE); // 接收发生错误后重启
-		__HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);		   // 手动关闭DMA_IT_HT中断
-        
+      if (huart->ErrorCode == HAL_UART_ERROR_ORE)
+      {
+		      __HAL_UART_CLEAR_OREFLAG(huart);       /* 清除ORE位 */ 
+          HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rx_buffer, BUFF_SIZE); // 接收发生错误后重启
+          __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);		   // 手动关闭DMA_IT_HT中断
+      }        
     }
 }
+
+/* 串口空闲缓冲区数据处理函数 */
+void UART_RX_Handle(void)
+{
+    if(UART_RX_Flag)
+    {  
+        switch(SlaveDevice_State)       
+        {
+            case DEVICE_IDLE:
+                if(!strcmp(rx_buffer,"DEVICE_C_B_V")) SlaveDevice_State 
+                    = DEVICE_CTRL_BY_VOFA;    /* 进入上位机初始选择状态 */
+                break;
+            case DEVICE_CTRL_BY_VOFA:
+                if(!strcmp(rx_buffer,"DEVICE_IDLE")) SlaveDevice_State 
+                    = DEVICE_IDLE;            /* 回到进入上位机控制初始状态前的默认状态 */
+                else if(!strcmp(rx_buffer,"Iq_C_Mode")) SlaveDevice_State 
+                    = CTRL_MODE;              /* 进入上位机控制状态 */
+                break;                    
+            case CTRL_MODE:
+                CtrlModeSet_Handle(rx_buffer);    /* 进入上位机力矩控制传参 */
+                if(!strcmp(rx_buffer,"Mode_Return")) SlaveDevice_State 
+                    = DEVICE_CTRL_BY_VOFA;       /* 退出该控制模式,返回到上位机选择初始状态 */
+                break;
+            default:break;
+        }
+
+        UART_RX_Flag = 0;
+        memset(rx_buffer, 0, BUFF_SIZE);							// 清除接收缓存
+    }
+    
+}
+
+
+/* 整数/小数字符串-->对应整型变量和浮点数变量 */
 
 /* x除以n次10 */
 float Pow_invert(uint8_t X,uint8_t n) 
@@ -108,33 +150,4 @@ void CtrlModeSet_Handle(uint8_t* Buffer)
 }
 
 
-/* 串口空闲缓冲区数据处理函数 */
-void UART_RX_Handle(void)
-{
-    if(UART_RX_Flag)
-    {  
-        switch(SlaveDevice_State)       
-        {
-            case DEVICE_IDLE:
-                if(!strcmp(rx_buffer,"DEVICE_C_B_V")) SlaveDevice_State 
-                    = DEVICE_CTRL_BY_VOFA;    /* 进入上位机初始选择状态 */
-                break;
-            case DEVICE_CTRL_BY_VOFA:
-                if(!strcmp(rx_buffer,"DEVICE_IDLE")) SlaveDevice_State 
-                    = DEVICE_IDLE;            /* 回到进入上位机控制初始状态前的默认状态 */
-                else if(!strcmp(rx_buffer,"Iq_C_Mode")) SlaveDevice_State 
-                    = CTRL_MODE;              /* 进入上位机控制状态 */
-                break;                    
-            case CTRL_MODE:
-                CtrlModeSet_Handle(rx_buffer);    /* 进入上位机力矩控制传参 */
-                if(!strcmp(rx_buffer,"Mode_Return")) SlaveDevice_State 
-                    = DEVICE_CTRL_BY_VOFA;       /* 退出该控制模式,返回到上位机选择初始状态 */
-                break;
-            default:break;
-        }
 
-        UART_RX_Flag = 0;
-        memset(rx_buffer, 0, BUFF_SIZE);							// 清除接收缓存
-    }
-    
-}

@@ -17,8 +17,8 @@ void mcu_module_init(void)
 
 void pid_init(void)
 {
-		Ipid_Init(&Iq_pid,0.02f,	0.0085f,0.0f,3.5f);		/* Iq  */
-		Ipid_Init(&Id_pid,0.02f,0.0085f,0.0f,3.5f);		/* Id  */
+		Ipid_Init(&Iq_pid,0.02f,0.0085f,0.0f,9.5f);		/* Iq  */
+		Ipid_Init(&Id_pid,0.02f,0.0085f,0.0f,9.5f);		/* Id  */
 	
 }
 
