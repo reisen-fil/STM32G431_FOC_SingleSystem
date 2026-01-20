@@ -16,9 +16,7 @@ void mcu_module_init(void)
 	HAL_TIMEx_PWMN_Start(&htim1,TIM_CHANNEL_3);
 
 	HAL_TIM_Base_Start(&htim2);			/* TIM2 for Speed timing */
-	
-//		OLED_Init();			/* OLED */
-//		OLED_Clear();		
+		
 }
 
 /* pid参数初始化 */
@@ -27,7 +25,7 @@ void pid_init(void)
 	single_pid_Init(&Iq_pid,0.01f,0.0085f,0.0f,3.5f);			/* Iq */
 	single_pid_Init(&Id_pid,0.01f,0.0085f,0.0f,3.5f);			/* Id */
 	single_pid_Init(&Speed_pid,0.08f,0.002f,0.0f,1.0f);			/* Sp */
-	single_pid_Init(&Position_pid,0.4f,0.0f,0.35f,15.0f);		/* Po */	
+	single_pid_Init(&Position_pid,0.5f,0.0f,0.35f,15.0f);		/* Po */	
 	
 }
 

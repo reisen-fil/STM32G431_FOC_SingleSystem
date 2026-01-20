@@ -64,16 +64,24 @@ void FOC_Model(void)			//FOC控制环路(转速环->电流环(内环))
 		Angle_Offset = Get_Current_Angle();		/* 获取带偏置的原始角度 */
 		Position_pid.value = Angle_Offset - Zero_Angle;
 
-		if(Position_pid.value < 0 && Po_ctrl_cnt>=10)	/* 过滤掉在对齐后一段时间对相对角度的检测 */
+		if(Motor_TargetAngle >= 0)		/* 根据目标角度极性进行判断 */
 		{
-			Position_pid.value += 360.0f;		/* 处理359->0边界 */
-			if(Position_pid.value>250.0f) Position_pid.value -= 360.0f;	 	
+			if(Position_pid.value < 0)
+			{
+				Position_pid.value += 360.0f;		/* 处理359->0边界 */
+				if(Position_pid.value > 250.0f) Position_pid.value -= 360.0f;			 	
+			}
 		}
-		else if(Po_ctrl_cnt<10)
-		{
-			Po_ctrl_cnt++;
+		else 
+		{	
+			if(Position_pid.value > 0)
+			{
+				Position_pid.value -= 360.0f;		/* 处理359->0边界 */
+				if(Position_pid.value < -250.0f) Position_pid.value += 360.0f;	
+			}			
 		}
-		Po_PD_Cal(&Position_pid,Po_Target_Angle,65.0f);
+
+		Po_PD_Cal(&Position_pid,Motor_TargetAngle,65.0f);
 		
 		Speed_pid.value = Get_MotorVelocity(&MotorSpeed_Calc);
 		Sp_PI_Cal(&Speed_pid,Position_pid.out,15.0f);

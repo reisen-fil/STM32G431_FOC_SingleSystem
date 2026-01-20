@@ -20,7 +20,6 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
-#include "fdcan.h"
 #include "i2c.h"
 #include "opamp.h"
 #include "tim.h"
@@ -97,22 +96,19 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_ADC1_Init();
-  MX_I2C1_Init();
   MX_I2C2_Init();
   MX_OPAMP1_Init();
   MX_OPAMP3_Init();
   MX_TIM1_Init();
   MX_USART1_UART_Init();
-  MX_FDCAN1_Init();
   MX_TIM7_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 	
-	mcu_module_init();
-	pid_init();
-  vofa_test_init();
-	
-	motor_state_init();
+	mcu_module_init();    /* BSP外设初始化 */
+	pid_init();           /* pid参数初始化 */ 
+	vofa_test_init();     /* 下位机接收中断初始化 */
+  motor_state_init();   /* 电机控制状态初始化 */ 
 
   /* USER CODE END 2 */
 
@@ -120,8 +116,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1) 
   {
-		
-			printf("%1.4f,%1.4f,%1.4f\n",Park_DQ.theta,Park_DQ.I_q,Speed_pid.value);    //test
+      UART_RX_Handle();   /* 处理下位机接收到的数据 */
+			printf("%1.4f,%1.4f,%1.4f\n",Park_DQ.theta,Park_DQ.I_q,Position_pid.value);    /* 上位机实时监测数据 */
 		
     /* USER CODE END WHILE */
 
@@ -178,12 +174,9 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)//DMA�ɼ�����жϷ�����
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-//	printf("����%d\r\n",ADC_Values[0]);
-//	printf("���%d\r\n",ADC_Values[1]);
-	
-		HAL_ADC_Stop_DMA(&hadc1);//�ر�DMA��ADC�ɼ�
+
 }
 
 
@@ -203,8 +196,7 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
-
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.

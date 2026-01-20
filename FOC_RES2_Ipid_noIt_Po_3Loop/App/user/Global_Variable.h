@@ -17,7 +17,8 @@ typedef enum {
 typedef enum {
     DEVICE_IDLE = 0,        
     DEVICE_CTRL_BY_VOFA,     	/* 上位机控制模式 */
-    DEVICE_CTRL_BY_PERI			/* 外部硬件控制模式(按键等) */              
+	CTRL_MODE,
+    DEVICE_CTRL_BY_PERI			/* 外部硬件控制模式(按键等) */                
 }Device_State;
 
 extern System_State Motor_State;
@@ -63,7 +64,6 @@ struct AlphaBeta_Aix
 };
 
 extern uint8_t Ictrl_cnt;			/* Ipid_Ctrl_cnt */
-extern uint8_t Po_ctrl_cnt;			/* Po_pid_Ctrl_cnt */
 
 //SVPWM部分
 struct SVPWM_Control
@@ -108,6 +108,8 @@ extern Str_pid Iq_pid;
 extern Str_pid Speed_pid;    /* 速度环pid */
 extern Str_pid Position_pid;   /* 位置式pid */
 
+extern float Motor_TargetAngle;		/* 电机目标位置 */
+
 typedef struct 
 {
     float current_angle_rad;      // 当前角度（弧度）
@@ -121,7 +123,7 @@ typedef struct
 }Speed_Calculator;			/* 角速度计算 */
 
 extern Speed_Calculator MotorSpeed_Calc;       /* 电机角速度计算 */
-extern float Angle_Offset,Last_Angle_Offset;                     /* 从编码器中获取的带偏置的原始角度 */
+extern float Angle_Offset;                     /* 从编码器中获取的带偏置的原始角度 */
 
 
 /* ADC(I) */
@@ -130,6 +132,8 @@ extern float Amp_Offset[2];		/* 采样电压偏置 */
 
 /* debug */
 extern uint8_t rx_buffer[BUFF_SIZE]; 
+extern uint8_t UART_RX_Flag;
+extern volatile uint8_t usart_dma_tx_over;        /* 串口dma发送完成置位 */
 
 #endif
 

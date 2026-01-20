@@ -7,16 +7,15 @@
 #include "Global_Variable.h"
 #include "Mymath.h"
 #include "sys_init.h"
+#include "debug.h"
 
 /* C */
 #include "stdio.h"
+#include "stdarg.h"
 #include "math.h"
 
 
 /* Peripherals */
-#include "oled.h"
-#include "oledfont.h"
-
 #include "PMSM_FOC.h"
 #include "AS5600.h"
 

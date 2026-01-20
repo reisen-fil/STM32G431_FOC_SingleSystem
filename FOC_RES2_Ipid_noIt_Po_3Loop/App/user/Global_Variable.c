@@ -25,7 +25,6 @@ struct SVPWM_Control FOC_ctrl;
 struct SVPWM_Duty FOC_Duty;
 
 uint8_t Ictrl_cnt;			/* Ipid_Ctrl_cnt */
-uint8_t Po_ctrl_cnt;			/* Po_pid_Ctrl_cnt */
 
 /* pid */
 Str_pid Id_pid;   /* 电流环pid */
@@ -34,12 +33,14 @@ Str_pid Speed_pid;    /* 速度环pid */
 Str_pid Position_pid;   /* 位置式pid */
 
 Speed_Calculator MotorSpeed_Calc;       /* 电机角速度计算 */
-float Angle_Offset,Last_Angle_Offset;                     /* 从编码器中获取的带偏置的原始角度 */
+float Angle_Offset;                     /* 从编码器中获取的带偏置的原始角度 */
+float Motor_TargetAngle;            /* 电机目标位置 */
 
 
 /* debug */
 uint8_t rx_buffer[BUFF_SIZE];           /* 接收缓冲区 */
-
+uint8_t UART_RX_Flag;
+volatile uint8_t usart_dma_tx_over = 1;        /* 串口dma发送完成置位 */
 
 
 

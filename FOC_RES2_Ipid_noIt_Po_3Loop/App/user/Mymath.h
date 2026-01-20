@@ -19,7 +19,6 @@
 #define Gain  50.0f            /* 电流采样运放增益 */
 
 #define MICROSECONDS_PER_SECOND  1000000.0f         /* 1s对应的us数量 */
-#define Po_Target_Angle          150.0f
 
 #define BUFF_SIZE                20                 /* 空闲中断缓冲区大小 */
 
