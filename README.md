@@ -28,12 +28,15 @@
   Base on the pulling,only setting the Uq constant then updating electrical angle in real-time on the Park-axiy.
 
 ### CloseLoop Current Control
+![I_pid](https://github.com/user-attachments/assets/967786aa-eb30-4e74-a044-c6ac7aeb0e3b)
   Current Sampling module begin to work with Clark-transform and Park-transform to get the actual Iq and Id,then inputting to Current-PID Loop to achieve CloseLoop Iq and Id control.  
 
 ### CloseLoop Speed Control
+![Speed_I_pid](https://github.com/user-attachments/assets/46d9e57c-9a36-40f4-bee1-278fcb9aebf8)
   Base on the Current-PID Loop,Calculating actual motor speed and inputting to Speed-PID Loop in the outer loop of the Current-PID Loop to achieve CloseLoop Speed control.
 
 ### CloseLoop Angle Control
+![Position_Speed_I_pid](https://github.com/user-attachments/assets/b225fc17-abc0-4670-b00d-df90691b22cb)
   Base on the Speed-PID Loop,Calculating actual motor Angle and inputting to Angle-PID Loop in the outer loop of the Speed-PID Loop to achieve CloseLoop Angle control.  
 
 ---
